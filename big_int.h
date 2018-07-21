@@ -18,6 +18,7 @@ struct BigInt {
 		: v(input) { }
 	BigInt(): v() { };
 	BigInt(long n);
+	BigInt(const BigInt & bi);
 
 	BigInt add (const BigInt & bi2);
 	BigInt multiply (const BigInt & bi2);
@@ -25,6 +26,8 @@ struct BigInt {
 	// unsafe - will not handle overflow
 	long to_long() const;
 	friend std::ostream & operator << (std::ostream &os, BigInt const & bi);
+	friend bool operator< (const BigInt & bi1, const BigInt & bi2);
+	bool operator== (const BigInt & bi2);
 };
 
 

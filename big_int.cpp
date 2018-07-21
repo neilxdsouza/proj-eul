@@ -4,13 +4,14 @@
 #include <algorithm>
 #include <cmath>
 #include <sstream>
+#include <map>
 
 using std::vector;
 using std::cout;
 using std::endl;
+using std::map;
 
 
-int BigInt::base = 1000000;
 
 void  print(const vector<int> & v) {
 	for (int i = v.size()-1; i >= 1; --i) {
@@ -60,18 +61,70 @@ long BigInt::to_long() const {
 	return actual1;
 }
 
+// will need to handle sign of BigInt later 
+bool operator< (const BigInt & bi1, const BigInt & bi2) {
+	cout << bi1 << " operator < " << bi2 << endl;
+	if (bi1.size() < bi2.size()) {
+		cout << __PRETTY_FUNCTION__ << " returning false - 1" << endl;
+		return true;
+	} else if (bi1.size() > bi2.size()) {
+		cout 
+			<< "bi1: " << bi1 << ", bi1.size(): " << bi1.size()
+			<< "  bi2: " << bi2 << ", bi2.size(): " << bi2.size()
+			<< endl;
+		cout << __PRETTY_FUNCTION__ << " returning false - 2" << endl;
+		return false;
+	} else {
+		int i = bi1.size()-1;
+		for (; i >= 0; --i) {
+			cout << "v[" << i << "]:" << bi1.v[i]
+				<< "bi2.v[" << i << "]:" << bi2.v[i]
+				<< endl;
+			if (bi1.v[i] < bi2.v[i]) {
+				cout << __PRETTY_FUNCTION__ << " returning true - 3" << endl;
+				return true;
+			} else if (bi1.v[i] > bi2.v[i]) {
+				cout << __PRETTY_FUNCTION__ << " returning false - 4" << endl;
+				return false;
+			} else {
+				// the digits are equal 
+				// continue to next lower digit
+			}
+		}
+		// if (i == 0) {
+		// 	return false;
+		// }
+		cout << __PRETTY_FUNCTION__ << " returning false - 5" << endl;
+		return false;
+	}
+
+}
+
+// will need to handle sign of BigInt later 
+bool BigInt::operator== (const BigInt & bi2) {
+	if (v.size() != bi2.size()) {
+		return false;
+	}
+	for (int i = v.size()-1; i >= 0; --i) {
+		if (bi2.v[i] != v[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
 BigInt BigInt::add (const BigInt & bi2) {
 	const vector<int> & bigger  = size() > bi2.size() ? v : bi2.v;
 	const vector<int> & smaller = size() <= bi2.size() ? v : bi2.v;
 	BigInt big_res;
 	big_res.set_size(bigger.size() + 1);
 	vector<int> & res = big_res.v;
-	cout    << "   bigger.size(): " <<  bigger.size() 
-		<< endl;
-	::print(bigger);
-	cout    << ", smaller.size(): " << smaller.size()
-		<< endl;
-	::print(smaller);
+	//cout    << "   bigger.size(): " <<  bigger.size() 
+	//	<< endl;
+	//::print(bigger);
+	// cout    << ", smaller.size(): " << smaller.size()
+	// 	<< endl;
+	// ::print(smaller);
 	int carry = 0;
 	for (int i = 0; i < smaller.size(); ++i) {
 		int add_res = smaller[i] + bigger[i] + carry;
@@ -213,7 +266,75 @@ void test_multiply(int i1, int i2)
 
 }
 
-void test_multiply() {
+void test_add (int i1, int i2)
+{
+	long expected = (long) i1 + i2;
+	cout << "add " << i1 << " + " << i2 << ": " <<  expected << endl;
+	BigInt b1(i1);
+	BigInt b2(i2);
+	BigInt r12 = b1.add(b2);
+	BigInt r21 = b2.add(b1);
+	long actual1 = r12.to_long();
+	long actual2 = r21.to_long();
+
+	if (! ((actual2 == actual1) && (actual1 == expected)) ) {
+		cout << "test failed " << endl;
+		cout << "actual1: " << actual1 << endl;
+		cout << "actual2: " << actual2 << endl;
+		cout << "expected: " << expected << endl;
+		cout << "r12 : " << endl;
+		cout << r12 << endl;
+		// r12.print();
+		cout << "r21 : " << endl;
+		//r21.print();
+		cout << r21 << endl;
+		exit(1);
+	} else {
+		cout << "test passed got expected: " << expected;
+		cout << "r12.print : " << endl;
+		r12.print();
+		cout << ", r12 : " << r12 << endl;
+	}
+	std::stringstream s1; s1 << expected;
+	std::stringstream s2; s2 << r12;
+	if (s1.str() != s2.str()) {
+		cout << "s1.str(): " << s1.str() 
+			<< " != s2.str():" << s2.str()
+			<< endl;
+		exit(1);
+	}
+}
+
+void test_add()
+{
+	for (int b = 10; b < 100000000; b *= 10) {
+		BigInt::base = b;
+		
+		test_add(1234, 5678);
+		test_add(12345, 5678);
+		test_add(12345, 567);
+		test_add(999, 9989);
+		test_add(0, 1);
+		test_add(0, 99);
+		test_add(0, 999);
+		test_add(0, 9999);
+		test_add(0, 99999);
+		test_add(1, 99);
+		test_add(1, 999);
+		test_add(1, 9999);
+		test_add(1, 99999);
+		BigInt b1(1234), b2(9876);
+		b1 = b1.add(b2);
+		cout << "b1: " << b1 << endl;
+		BigInt b3(1234), b4(987667);
+		b3 = b3.add(b4);
+		cout << "b3: " << b3 << endl;
+		cout << "b4: " << b4 << endl;
+	}
+}
+
+void test_multiply()
+{
 	long passed_tests = 0;
 	for (int b = 100; b < 100000000; b *= 10) {
 		BigInt::base = b;
@@ -319,7 +440,7 @@ std::ostream & operator << (std::ostream &os, BigInt const & bi)
 					// cout << "c: " << c << endl;
 					for (int i = 0; i <c; ++i) {
 						os << "0";
-						cout << "-0-" << endl;
+						// cout << "-0-" << endl;
 					}
 				} else if (v[i] >= BigInt::base / 10) {
 					os << v[i] ; // no padding needed
@@ -364,41 +485,124 @@ std::ostream & operator << (std::ostream &os, BigInt const & bi)
 	return os;
 }
 
-int main()
+BigInt::BigInt(const BigInt & bi): v(bi.v)
 {
-	BigInt b1(1413121110987654321);
-	b1.print();
-	// {
-	// 	BigInt b2(54321);
-	// 	BigInt b3( 8765);
-	// 	BigInt r23 = b2.add(b3);
-	// 	r23.print();
-	// 	BigInt r32 =b3.add(b2);
-	// 	r32.print();
-	// 	BigInt b31(54321);
-	// 	BigInt b21( 8765);
-	// 	BigInt r2131 = b21.add(b31);
-	// 	r2131.print();
-	// 	BigInt r3121 = b31.add(b21);
-	// 	r3121.print();
-	// 	BigInt b32( 4321);
-	// 	BigInt b22( 8765);
-	// 	BigInt r2232 = b22.add(b32);
-	// 	r2232.print();
-	// 	BigInt r3222 = b32.add(b22);
-	// 	r3222.print();
-	// 	BigInt b33( 9999);
-	// 	BigInt b23( 1);
-	// 	BigInt r3323 = b33.add(b23);
-	// 	r3323.print();
-	// }
-	
-	// for (int i = 0; i < (1<<30); ++i) {
-	// 	for (int j = 0; j < (1<<30); ++j) {
-	// 		long res = i * j ;
-	// 		
-	// 	}
-	// }
-	test_multiply();
 }
+
+void test_oper_less(int i1, int i2) 
+{
+	bool expected =  i1 < i2;
+	cout << "less " << i1 << " < " << i2 << ": " <<  expected << endl;
+	BigInt b1(i1);
+	BigInt b2(i2);
+	bool r12 = b1 < b2;
+	bool r21 = b2 < b1;
+	bool is_eq  = b1 == b2;
+
+	cout << "b1 == b2 : " << is_eq  << endl;
+
+	if (! ( ((r12 != r21) || (r12 == r21 && b1 == b2)) &&
+		 (r12 == expected)) ) {
+		cout << "test failed " << endl;
+		cout << "expected: " << expected << endl;
+		cout << "r12 : " << endl;
+		cout << r12 << endl;
+		// r12.print();
+		cout << "r21 : " << endl;
+		//r21.print();
+		cout << r21 << endl;
+		exit(1);
+	} else {
+		cout << "test passed got expected: " << expected;
+		//cout << "r12.print : " << endl;
+		//r12.print();
+		cout << ", r12 : " << r12 << endl;
+	}
+	//std::stringstream s1; s1 << expected;
+	//std::stringstream s2; s2 << r12;
+	//if (s1.str() != s2.str()) {
+	//	cout << "s1.str(): " << s1.str() 
+	//		<< " != s2.str():" << s2.str()
+	//		<< endl;
+	//	exit(1);
+	//}
+}
+
+void test_oper_less() {
+	long passed_tests = 0;
+	for (int b = 10; b < 100000000; b *= 10) {
+		test_oper_less(1, 1);
+		test_oper_less(0, 0);
+		test_oper_less(1234, 5678);
+		test_oper_less(12345, 5678);
+		test_oper_less(12345, 567);
+		test_oper_less(999, 9989);
+		test_oper_less(0, 1);
+		test_oper_less(0, 99);
+		test_oper_less(0, 999);
+		test_oper_less(0, 9999);
+		test_oper_less(0, 99999);
+		test_oper_less(1, 99);
+		test_oper_less(1, 999);
+		test_oper_less(1, 9999);
+		test_oper_less(1, 99999);
+
+		for (int i = 0; i < 10000; i+= 73 ) {
+			for (int j = 0; j < 10000; j+= 73 ) {
+				test_oper_less(i, j);
+				++ passed_tests;
+			}
+			//if (i%80 == 0) {
+			//	cout << "." << endl;
+			//} else {
+			//	cout << "." ;
+			//}
+		}
+	}
+}
+
+// int BigInt::base = 1000000;
+// int main()
+// {
+// 	BigInt b1(1413121110987654321);
+// 	b1.print();
+// 	// {
+// 	// 	BigInt b2(54321);
+// 	// 	BigInt b3( 8765);
+// 	// 	BigInt r23 = b2.add(b3);
+// 	// 	r23.print();
+// 	// 	BigInt r32 =b3.add(b2);
+// 	// 	r32.print();
+// 	// 	BigInt b31(54321);
+// 	// 	BigInt b21( 8765);
+// 	// 	BigInt r2131 = b21.add(b31);
+// 	// 	r2131.print();
+// 	// 	BigInt r3121 = b31.add(b21);
+// 	// 	r3121.print();
+// 	// 	BigInt b32( 4321);
+// 	// 	BigInt b22( 8765);
+// 	// 	BigInt r2232 = b22.add(b32);
+// 	// 	r2232.print();
+// 	// 	BigInt r3222 = b32.add(b22);
+// 	// 	r3222.print();
+// 	// 	BigInt b33( 9999);
+// 	// 	BigInt b23( 1);
+// 	// 	BigInt r3323 = b33.add(b23);
+// 	// 	r3323.print();
+// 	// }
+// 	
+// 	// for (int i = 0; i < (1<<30); ++i) {
+// 	// 	for (int j = 0; j < (1<<30); ++j) {
+// 	// 		long res = i * j ;
+// 	// 		
+// 	// 	}
+// 	// }
+// 	// test_multiply();
+// 	// test_add();
+// 	test_oper_less();
+// 	map<BigInt, BigInt > m_big_int;
+// 	BigInt b31(1001), b41(200321);
+// 	m_big_int[b31] = b31;
+// 	m_big_int[b41] = b41;
+// }
 
