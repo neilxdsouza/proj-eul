@@ -13,6 +13,7 @@
 #include <sstream>
 #include <map>
 #include <time.h>
+#include <string>
 
 using std::vector;
 using std::cout;
@@ -92,30 +93,34 @@ long BigInt::to_long() const {
 
 // will need to handle sign of BigInt later 
 bool operator< (const BigInt & bi1, const BigInt & bi2) {
-	cout << bi1 << " operator < " << bi2 << endl;
+	std::string fn_name = __PRETTY_FUNCTION__ ;
+	// cout 
+	// 	<< "ENTER " << fn_name 
+	// 	<< " bi1: " << bi1 << " [ operator < ] "
+	// 	<< " bi2: " << bi2 << endl;
 	int bi1_index = bi1.size();
 	int bi2_index = bi2.size();
 	if (bi1.size() < bi2.size()) {
-		cout << __PRETTY_FUNCTION__ << " returning false - 1" << endl;
+		// cout << fn_name << " returning true - 1" << endl;
 		return true;
 	} else if (bi1.size() > bi2.size()) {
-		cout 
-			<< "bi1: " << bi1 << ", bi1.size(): " << bi1.size()
-			<< "  bi2: " << bi2 << ", bi2.size(): " << bi2.size()
-			<< endl;
-		cout << __PRETTY_FUNCTION__ << " returning false - 2" << endl;
+		// cout 
+		// 	<< "bi1: " << bi1 << ", bi1.size(): " << bi1.size()
+		// 	<< "  bi2: " << bi2 << ", bi2.size(): " << bi2.size()
+		// 	<< endl;
+		// cout << "EXIT " << fn_name << " returning false - 2" << endl;
 		return false;
 	} else {
 		int i = bi1.size()-1;
 		for (; i >= 0; --i) {
-			cout << "v[" << i << "]:" << bi1.v[i]
-				<< "bi2.v[" << i << "]:" << bi2.v[i]
-				<< endl;
+			// cout << "v[" << i << "]:" << bi1.v[i]
+			// 	<< "bi2.v[" << i << "]:" << bi2.v[i]
+			// 	<< endl;
 			if (bi1.v[i] < bi2.v[i]) {
-				cout << __PRETTY_FUNCTION__ << " returning true - 3" << endl;
+				// cout << "EXIT " << fn_name << " returning true - 3" << endl;
 				return true;
 			} else if (bi1.v[i] > bi2.v[i]) {
-				cout << __PRETTY_FUNCTION__ << " returning false - 4" << endl;
+				// cout << "EXIT " << fn_name << " returning false - 4" << endl;
 				return false;
 			} else {
 				// the digits are equal 
@@ -125,7 +130,10 @@ bool operator< (const BigInt & bi1, const BigInt & bi2) {
 		// if (i == 0) {
 		// 	return false;
 		// }
-		cout << __PRETTY_FUNCTION__ << " returning false - 5" << endl;
+		// cout << "EXIT: " << fn_name << " returning false - 5:"
+		// 	<< " bi1: " << bi1
+		// 	<< " bi2: " << bi2
+		// 	<< endl;
 		return false;
 	}
 
@@ -133,14 +141,24 @@ bool operator< (const BigInt & bi1, const BigInt & bi2) {
 
 // will need to handle sign of BigInt later 
 bool BigInt::operator== (const BigInt & bi2) {
-	if (v.size() != bi2.size()) {
+	std::string fn_name = __PRETTY_FUNCTION__ ;
+	if (size() != bi2.size()) {
+		// cout << "EXIT " << fn_name
+		// 	<< " return false : size mismatch"
+		// 	<< endl;
 		return false;
 	}
-	for (int i = v.size()-1; i >= 0; --i) {
+	for (int i = bi2.size()-1; i >= 0; --i) {
 		if (bi2.v[i] != v[i]) {
+			// cout << "EXIT " << fn_name
+			// 	<< " return false : size same - value mismatch"
+			// 	<< endl;
 			return false;
 		}
 	}
+	// cout << "EXIT " << fn_name
+	// 	<< " return true : size same - value same"
+	// 	<< endl;
 	return true;
 }
 
@@ -310,10 +328,10 @@ std::ostream & operator << (std::ostream &os, BigInt const & bi)
 		// 		break;
 		// 	}
 		// }
-		cout << "bi.size(): " << bi.size() << endl;
+		// cout << "bi.size(): " << bi.size() << endl;
 		if (bi.size() >= 0 ) {
 			int index = bi.size();
-			cout << "index: " << index << endl;
+			// cout << "index: " << index << endl;
 			for (int i = 0; i < index; ++i) {
 				v.push_back(bi.v[i]);
 			}

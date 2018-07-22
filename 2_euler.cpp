@@ -25,16 +25,15 @@ using namespace std;
 
 #include "big_int.h"
 
-BigInt compute_even_fibonacci_less_than_n(long n) {
+BigInt compute_even_fibonacci_less_than_n(long n, map<BigInt, BigInt> & map_sums) {
 	// cout << "ENTER " << __PRETTY_FUNCTION__ << endl;
-	BigInt i1(1);
-	BigInt i2(2);
+	BigInt bi1(1);
+	BigInt bi2(2);
 	BigInt limit(n);
 	long l1 = 1, l2 = 2;
 	if (n == 1 || n == 2) {
 		return 0;
 	} 
-	static map<BigInt, BigInt> map_sums;
 
 	//long sum = 2;
 	BigInt sum(2);
@@ -42,23 +41,25 @@ BigInt compute_even_fibonacci_less_than_n(long n) {
 	long sum_l(2);
 	do {
 		long next_term_l = l1 + l2;
-		BigInt next_term = i1.add(i2);
+		BigInt next_term = bi1.add(bi2);
 		l1 = l2;
-		i1 = i2;
+		bi1 = bi2;
 		// cout << "BigInt next_term: " << next_term << endl;
 		if (next_term_l < n && next_term_l % 2 == 0) {
 			sum = sum.add(next_term);
 			sum_l += next_term_l;
+			if (map_sums.find(sum) == map_sums.end()) {
+				map_sums[sum] = sum;
+			}
 		}
 		l2 = next_term_l;
-		i2 = next_term;
-		cout <<  "i2: " << i2 << ", limit: " << limit
-			<< " i2 < limit: " << (i2 < limit) << endl;
-	} while (i2 < limit);
+		bi2 = next_term;
+		// cout <<  "bi2: " << bi2 << ", limit: " << limit
+		// 	<< " (bi2 < limit) ?: " << (bi2 < limit) << endl;
+	} while (bi2 < limit);
 	// cout << "returning sum_l : " << sum_l << endl;
 	// cout << "returning sum : " << sum << endl;
 	map_sums[sum] = sum;
-    
 	return sum;
 }
 
@@ -69,11 +70,26 @@ int main()
 
 	int t;
 	cin >> t;
+	long max_value = powl(10, 17);
+	std::map<BigInt, BigInt> map_sums;
+	compute_even_fibonacci_less_than_n(max_value, map_sums);
 	for(int a0 = 0; a0 < t; a0++) {
 		long n;
 		cin >> n;
-		cout << compute_even_fibonacci_less_than_n(n);
-		cout << endl;
+		// cout << compute_even_fibonacci_less_than_n(n);
+		// cout << "lower_bound for n: " << n << " is : ";
+		BigInt bi_n(n);
+		std::map<BigInt, BigInt>::iterator it_low =
+			map_sums.lower_bound(bi_n);
+		// cout << " LOWER_BOUND: "
+		// 	<< it_low->first << " "
+		// 	<< it_low->second <<  endl;
+		cout << it_low->first << endl;
+		// std::map<BigInt, BigInt>::iterator it_up =
+		// 	map_sums.upper_bound(bi_n);
+		// cout << " UPPER_BOUND: "
+		// 	<<  it_up->first << " "
+		// 	<<  it_up->first <<  endl;
 	}
 	return 0;
 }

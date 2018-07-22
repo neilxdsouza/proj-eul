@@ -460,6 +460,9 @@ void test_multiply()
 
 void test_oper_less(BigInt bi1, BigInt bi2)
 {
+	string fn_name = __PRETTY_FUNCTION__ ;
+	cout << "ENTER " << fn_name << " bi1: " << bi1
+		<< "  bi2: " << bi2 << endl;
 	bool r12 = bi1 < bi2;
 	bool r21 = bi2 < bi1;
 	bool is_eq  = bi1 == bi2;
@@ -468,6 +471,9 @@ void test_oper_less(BigInt bi1, BigInt bi2)
 	bool expected =  i1 < i2;
 	if (! ( ((r12 != r21) || (r12 == r21 && bi1 == bi2)) &&
 		 (r12 == expected)) ) {
+		cout << "EXIT " << fn_name << " bi1: " << bi1
+			<< "  bi2: " << bi2 << endl;
+		cout << "is_eq : " << is_eq << endl;
 		cout << "test failed " << endl;
 		cout << "expected: " << expected << endl;
 		cout << "r12 : " << endl;
@@ -514,6 +520,7 @@ void test_oper_less() {
 		// r12.print();
 		BigInt r21 = b2.multiply(b1);
 		test_oper_less(b1, b2);
+		test_oper_less(r12, r21);
 		
 		time_t seed = time(NULL);
 		cout << "Initializing random number generator with time: "
