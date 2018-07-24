@@ -129,7 +129,7 @@ bool operator< (const BigInt & bi1, const BigInt & bi2)
 }
 
 // will need to handle sign of BigInt later 
-bool BigInt::operator== (const BigInt & bi2) {
+bool BigInt::operator== (const BigInt & bi2) const {
 	std::string fn_name = __PRETTY_FUNCTION__ ;
 	if (size() != bi2.size()) {
 		// cout << "EXIT " << fn_name
@@ -321,6 +321,9 @@ std::ostream & operator << (std::ostream &os, BigInt const & bi)
 		if (bi.size() >= 0 ) {
 			int index = bi.size();
 			// cout << "index: " << index << endl;
+			if (bi.sign == BigInt::Negative) {
+				os << '-';
+			}
 			for (int i = 0; i < index; ++i) {
 				v.push_back(bi.v[i]);
 			}
@@ -408,9 +411,40 @@ void BigInt::set_sign(BigInt::Sign s)
 // 1 - 23
 // 23 - 1
 // 23 - (-47)
-BigInt BigInt::actual_subtract(BigInt bi2)
+BigInt BigInt::actual_subtract(const BigInt & bi2) const
 {
-
+	BigInt res;
+	// First handle 0 subtraction here
+	// then go back and do the optimization
+	const BigInt & bi = *this;
+	BigInt bi1(bi);
+	// we will always be called with 
+	// * this >= bi2
+	// this means the following
+	// bi1.size() >= bi2.size();
+	if (bi1 == bi2) {
+		return res;
+	}
+	// Now that the equality case
+	// has been handled bi1 is strictly > bi2
+	// 
+	int bi2_sz = bi2.size();
+	for (int i = 0; i < bi2_sz; ++i) {
+		// Maths will guarantee us
+		// that if the below is true
+		// there's another digit to the left 
+		// of this digit
+		if (bi1.v[i] < bi2.v[i]) {
+			bi1.v[i+1] -= 1;
+			bi1.v[i] *= base;
+		}
+		res.v.push_back( bi1.v[i] - bi2.v[i]);
+	}
+	int bi1_sz = bi1.size();
+	for (int i = bi2_sz; i < bi1.size(); ++i) {
+		res.v.push_back(bi1.v[i]);
+	}
+	return res;
 }
 
 // bi1 - bi2
@@ -421,18 +455,20 @@ BigInt subtract (const BigInt & bi1, const BigInt & bi2)
 	if (bi1 < bi2) {
 		res = bi2.actual_subtract(bi1);
 		res.set_sign(BigInt::Negative);
+	} else if (bi1 == bi2) {
+		// res is 0
 	} else {
 		res = bi1.actual_subtract(bi1);
 	}
 	return res;
 }
 
-BigInt subtract (const BigInt & bi2)
-{
-	if (*this > bi2) {
-
-	}
-}
+// BigInt subtract (const BigInt & bi2)
+// {
+// 	if (*this > bi2) {
+// 
+// 	}
+// }
 
 BigInt::BigInt(const BigInt & bi): v(bi.v)
 {

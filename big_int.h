@@ -13,6 +13,7 @@
 struct BigInt {
 	static int base;
 	std::vector<int> v;
+	enum Sign { Negative, Positive};
 	Sign sign;
 	int size() const;
 	void set_size(int n) { v.resize(n); 
@@ -36,11 +37,10 @@ struct BigInt {
 	friend std::ostream & operator << (std::ostream &os, BigInt const & bi);
 	friend bool operator< (const BigInt & bi1, const BigInt & bi2);
 	friend bool numeric_magnitude (const BigInt & bi1, const BigInt & bi2);
-	bool operator== (const BigInt & bi2);
-	enum Sign { Negative, Positive};
+	bool operator== (const BigInt & bi2) const;
 	void set_sign(Sign s);
 
-	BigInt actual_subtract(BigInt bi2);
+	BigInt actual_subtract(const BigInt & bi2) const;
 
 };
 
