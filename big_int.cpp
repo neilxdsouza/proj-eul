@@ -50,7 +50,7 @@ void  print(const vector<int> & v) {
 	cout << endl;
 }
 
-void  BigInt::print() {
+void  BigInt::print() const {
 	//for (int i = v.size()-1; i >= 1; --i) {
 	//	cout << v[i] << ':';
 	//}
@@ -413,30 +413,43 @@ void BigInt::set_sign(BigInt::Sign s)
 // 23 - (-47)
 BigInt BigInt::actual_subtract(const BigInt & bi2) const
 {
+	std::string fn_name = __PRETTY_FUNCTION__ ;
+	cout << "ENTER " << fn_name ;
 	BigInt res;
 	// First handle 0 subtraction here
 	// then go back and do the optimization
 	const BigInt & bi = *this;
 	BigInt bi1(bi);
-	// we will always be called with 
-	// * this >= bi2
-	// this means the following
-	// bi1.size() >= bi2.size();
+	// we handle this case - for protection 
+	// 
 	if (bi1 == bi2) {
 		return res;
 	}
+	cout	<< " bi1: "; bi1.print(); cout << endl;
+ 	cout	<< " bi2: "; bi2.print(); cout << endl;
+	// But we will always be called with 
+	// *this > bi2 (strictly greater than)
+	// this means the following
+	// bi1.size() >= bi2.size();
 	// Now that the equality case
 	// has been handled bi1 is strictly > bi2
 	// 
 	int bi2_sz = bi2.size();
 	for (int i = 0; i < bi2_sz; ++i) {
 		// Maths will guarantee us
-		// that if the below is true
+		// that if bi1 > bi2
 		// there's another digit to the left 
 		// of this digit
 		if (bi1.v[i] < bi2.v[i]) {
+			cout << " Doing a borrow bi1.v[" << i+1 << "] was "
+				<< bi1.v[i+1]
+				<< " v[" << i << "] was " << v[i];
+
 			bi1.v[i+1] -= 1;
 			bi1.v[i] *= base;
+			cout <<   " after borrow bi1.v[" << i+1 << "] is "
+				<< bi1.v[i+1]
+				<< " v[" << i << "]  is " << v[i];
 		}
 		res.v.push_back( bi1.v[i] - bi2.v[i]);
 	}
@@ -449,17 +462,26 @@ BigInt BigInt::actual_subtract(const BigInt & bi2) const
 
 // bi1 - bi2
 // 
-BigInt subtract (const BigInt & bi1, const BigInt & bi2)
+BigInt subtract (const BigInt & bi1, const BigInt & bi2) 
 {
+	std::string fn_name = __PRETTY_FUNCTION__;
+	cout << "ENTER " << fn_name
+		<< " bi1: " << bi1
+		<< " bi2: " << bi2 << endl;
+
 	BigInt res;
 	if (bi1 < bi2) {
+		cout << " case bi1 < bi2" << endl;
 		res = bi2.actual_subtract(bi1);
 		res.set_sign(BigInt::Negative);
 	} else if (bi1 == bi2) {
+		cout << " case bi1 == bi2" << endl;
 		// res is 0
 	} else {
+		cout << " case bi1 > bi2" << endl;
 		res = bi1.actual_subtract(bi1);
 	}
+	cout << "EXIT " << fn_name << " returning : " << res;
 	return res;
 }
 

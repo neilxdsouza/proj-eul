@@ -29,9 +29,9 @@ struct BigInt {
 
 	BigInt add (const BigInt & bi2);
 	BigInt multiply (const BigInt & bi2);
-	BigInt subtract (const BigInt & bi2);
-	friend BigInt subtract (const BigInt & bi1, const BigInt & bi2);
-	void print();
+	BigInt subtract (const BigInt & bi2)const ;
+	friend BigInt subtract (const BigInt & bi1, const BigInt & bi2) ;
+	void print() const ;
 	// unsafe - will not handle overflow
 	long to_long() const;
 	friend std::ostream & operator << (std::ostream &os, BigInt const & bi);

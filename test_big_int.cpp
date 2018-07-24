@@ -457,6 +457,93 @@ void test_multiply()
 }
 */
 
+void test_subtract(const BigInt & bi1, const BigInt & bi2)
+{
+	string fn_name = __PRETTY_FUNCTION__ ;
+	BigInt::base = 10;
+	cout << "ENTER " << fn_name
+		<< " bi1 : " << bi1
+		<< " , bi2: " << bi2
+		<< endl;
+	cout << "bi1: " << bi1 << "bi2: "
+		<< bi2 << " (bi1 - bi2): "
+		<< subtract(bi1, bi2)
+		<< endl;
+	cout << "bi1: " << bi1 << "bi2: "
+		<< bi2 << " (bi2 - bi1): "
+		<< subtract(bi2, bi1)
+		<< endl;
+}
+
+void test_subtract()
+{
+	{
+		BigInt bi1(0), bi2(0);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(0), bi2(1);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(0), bi2(2);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(1), bi2(2);
+		test_subtract(bi1, bi2);
+	}
+
+	{
+		BigInt bi1(2), bi2(9);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(0), bi2(11);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(1), bi2(11);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(1), bi2(99);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(11), bi2(99);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(11), bi2(999);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(11), bi2(9999);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(9), bi2(11);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(99), bi2(11);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(999), bi2(11);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(987), bi2(12);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(987), bi2(76);
+		test_subtract(bi1, bi2);
+	}
+
+}
 
 void test_oper_less(BigInt bi1, BigInt bi2)
 {
@@ -494,6 +581,69 @@ void test_oper_less(BigInt bi1, BigInt bi2)
 	//if (s1.str() != s2.str()) 
 }
 
+void test_oper_is_eq(const BigInt & bi1, const BigInt & bi2) {
+	string fn_name = __PRETTY_FUNCTION__;
+
+	long l1 = bi1.to_long();
+	long l2 = bi2.to_long();
+
+	cout << "ENTER " << fn_name
+		<< " bi1: " << bi1
+		<< " bi2: " << bi2
+		<< " bi1 == bi2 : " << (bi1 == bi2)
+		<< " bi2 == bi1 : " << (bi2 == bi1)
+		<< " l1 == l2 : " << (l1 == l2)
+		<< (( (l1 == l2) == (bi1 == bi2)) ?
+			" Test passed " : "Test failed")
+		<< endl;
+
+	cout << "EXIT " << fn_name << endl;
+}
+
+void test_oper_is_eq() {
+	{
+		BigInt bi1(0), bi2(0);
+		test_oper_is_eq(bi1, bi2);
+	}
+	{
+		BigInt bi1(-1), bi2(0);
+		test_oper_is_eq(bi1, bi2);
+	}
+	{
+		BigInt bi1(1), bi2(0);
+		test_oper_is_eq(bi1, bi2);
+	}
+	{
+		BigInt bi1(98), bi2(0);
+		test_oper_is_eq(bi1, bi2);
+	}
+	{
+		BigInt bi1(98), bi2(-1);
+		test_oper_is_eq(bi1, bi2);
+	}
+	{
+		BigInt bi1(98), bi2(-1);
+		test_oper_is_eq(bi1, bi2);
+	}
+	{
+		BigInt bi1(-98), bi2(-1);
+		test_oper_is_eq(bi1, bi2);
+	}
+	{
+		BigInt bi1(-98), bi2(1);
+		test_oper_is_eq(bi1, bi2);
+	}
+	{
+		BigInt bi1(-98), bi2(0);
+		test_oper_is_eq(bi1, bi2);
+	}
+	{
+		BigInt bi1(7), bi2(11), bi3(77);
+		test_oper_is_eq(bi1.multiply(bi2), bi3);
+	}
+
+
+}
 
 void test_oper_less() {
 	long passed_tests = 0;
@@ -594,12 +744,18 @@ int main()
 #if TEST_ADD
 	test_add();
 #endif /* TEST_ADD */
+#if TEST_OPER_IS_EQ
+	test_oper_is_eq();
+#endif /* TEST_OPER_LESS */
 #if TEST_OPER_LESS
 	test_oper_less();
 #endif /* TEST_OPER_LESS */
 #if TEST_SIZE
 	test_size();
 #endif /* TEST_SIZE */
+#if TEST_SUBTRACT
+	test_subtract();
+#endif /* TEST_SUBTRACT */
 	// map<BigInt, BigInt > m_big_int;
 	// BigInt b31(1001), b41(200321);
 	// m_big_int[b31] = b31;
