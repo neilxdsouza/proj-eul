@@ -92,49 +92,38 @@ long BigInt::to_long() const {
 }
 
 // will need to handle sign of BigInt later 
-bool operator< (const BigInt & bi1, const BigInt & bi2) {
+bool operator< (const BigInt & bi1, const BigInt & bi2)
+{
 	std::string fn_name = __PRETTY_FUNCTION__ ;
 	// cout 
 	// 	<< "ENTER " << fn_name 
 	// 	<< " bi1: " << bi1 << " [ operator < ] "
 	// 	<< " bi2: " << bi2 << endl;
-	int bi1_index = bi1.size();
-	int bi2_index = bi2.size();
-	if (bi1.size() < bi2.size()) {
-		// cout << fn_name << " returning true - 1" << endl;
+	if (bi1.sign == BigInt::Negative &&
+		bi2.sign == BigInt::Positive) {
 		return true;
-	} else if (bi1.size() > bi2.size()) {
-		// cout 
-		// 	<< "bi1: " << bi1 << ", bi1.size(): " << bi1.size()
-		// 	<< "  bi2: " << bi2 << ", bi2.size(): " << bi2.size()
-		// 	<< endl;
-		// cout << "EXIT " << fn_name << " returning false - 2" << endl;
+	} else if (bi1.sign == BigInt::Positive &&
+			bi2.sign == BigInt::Negative ) {
 		return false;
 	} else {
-		int i = bi1.size()-1;
-		for (; i >= 0; --i) {
-			// cout << "v[" << i << "]:" << bi1.v[i]
-			// 	<< "bi2.v[" << i << "]:" << bi2.v[i]
-			// 	<< endl;
-			if (bi1.v[i] < bi2.v[i]) {
-				// cout << "EXIT " << fn_name << " returning true - 3" << endl;
-				return true;
-			} else if (bi1.v[i] > bi2.v[i]) {
-				// cout << "EXIT " << fn_name << " returning false - 4" << endl;
+		// both have the same sign
+		if (bi1.sign == BigInt::Positive) {
+			// case bi1: 51  <  bi2: 71
+			if (numeric_magnitude(bi1, bi2) == false) {
 				return false;
 			} else {
-				// the digits are equal 
-				// continue to next lower digit
+				return true;
+			}
+		} else {
+			// both are negative 
+			// smaller magnitude is bigger
+			// case bi1: -51  <  bi2: -71
+			if (numeric_magnitude(bi1, bi2) == false) {
+				return true;
+			} else {
+				return false;
 			}
 		}
-		// if (i == 0) {
-		// 	return false;
-		// }
-		// cout << "EXIT: " << fn_name << " returning false - 5:"
-		// 	<< " bi1: " << bi1
-		// 	<< " bi2: " << bi2
-		// 	<< endl;
-		return false;
 	}
 
 }
@@ -408,6 +397,91 @@ std::ostream & operator << (std::ostream &os, BigInt const & bi)
 	return os;
 }
 
+void BigInt::set_sign(BigInt::Sign s)
+{
+	sign = s;
+}
+
+// assume lhs (we are the lhs) is > they (rhs)
+// 123 - (-765)
+// 1 - 2
+// 1 - 23
+// 23 - 1
+// 23 - (-47)
+BigInt BigInt::actual_subtract(BigInt bi2)
+{
+
+}
+
+// bi1 - bi2
+// 
+BigInt subtract (const BigInt & bi1, const BigInt & bi2)
+{
+	BigInt res;
+	if (bi1 < bi2) {
+		res = bi2.actual_subtract(bi1);
+		res.set_sign(BigInt::Negative);
+	} else {
+		res = bi1.actual_subtract(bi1);
+	}
+	return res;
+}
+
+BigInt subtract (const BigInt & bi2)
+{
+	if (*this > bi2) {
+
+	}
+}
+
 BigInt::BigInt(const BigInt & bi): v(bi.v)
 {
+}
+
+bool numeric_magnitude (const BigInt & bi1, const BigInt & bi2)
+{
+	std::string fn_name = __PRETTY_FUNCTION__ ;
+	// cout 
+	// 	<< "ENTER " << fn_name 
+	// 	<< " bi1: " << bi1 << " [ operator < ] "
+	// 	<< " bi2: " << bi2 << endl;
+	int bi1_index = bi1.size();
+	int bi2_index = bi2.size();
+	if (bi1.size() < bi2.size()) {
+		// cout << fn_name << " returning true - 1" << endl;
+		return true;
+	} else if (bi1.size() > bi2.size()) {
+		// cout 
+		// 	<< "bi1: " << bi1 << ", bi1.size(): " << bi1.size()
+		// 	<< "  bi2: " << bi2 << ", bi2.size(): " << bi2.size()
+		// 	<< endl;
+		// cout << "EXIT " << fn_name << " returning false - 2" << endl;
+		return false;
+	} else {
+		int i = bi1.size()-1;
+		for (; i >= 0; --i) {
+			// cout << "v[" << i << "]:" << bi1.v[i]
+			// 	<< "bi2.v[" << i << "]:" << bi2.v[i]
+			// 	<< endl;
+			if (bi1.v[i] < bi2.v[i]) {
+				// cout << "EXIT " << fn_name << " returning true - 3" << endl;
+				return true;
+			} else if (bi1.v[i] > bi2.v[i]) {
+				// cout << "EXIT " << fn_name << " returning false - 4" << endl;
+				return false;
+			} else {
+				// the digits are equal 
+				// continue to next lower digit
+			}
+		}
+		// if (i == 0) {
+		// 	return false;
+		// }
+		// cout << "EXIT: " << fn_name << " returning false - 5:"
+		// 	<< " bi1: " << bi1
+		// 	<< " bi2: " << bi2
+		// 	<< endl;
+		return false;
+	}
+
 }

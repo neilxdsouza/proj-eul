@@ -13,6 +13,7 @@
 struct BigInt {
 	static int base;
 	std::vector<int> v;
+	Sign sign;
 	int size() const;
 	void set_size(int n) { v.resize(n); 
 		for (int i = 0; i < v.size(); ++i) {
@@ -27,12 +28,20 @@ struct BigInt {
 
 	BigInt add (const BigInt & bi2);
 	BigInt multiply (const BigInt & bi2);
+	BigInt subtract (const BigInt & bi2);
+	friend BigInt subtract (const BigInt & bi1, const BigInt & bi2);
 	void print();
 	// unsafe - will not handle overflow
 	long to_long() const;
 	friend std::ostream & operator << (std::ostream &os, BigInt const & bi);
 	friend bool operator< (const BigInt & bi1, const BigInt & bi2);
+	friend bool numeric_magnitude (const BigInt & bi1, const BigInt & bi2);
 	bool operator== (const BigInt & bi2);
+	enum Sign { Negative, Positive};
+	void set_sign(Sign s);
+
+	BigInt actual_subtract(BigInt bi2);
+
 };
 
 
