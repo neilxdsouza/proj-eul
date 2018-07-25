@@ -22,14 +22,15 @@ struct BigInt {
 		}
 	}
 	BigInt(const std::vector<int> & input)
-		: v(input) { }
-	BigInt(): v() { v.push_back(0); };
+		: v(input), sign(Positive) { }
+	BigInt(): v(), sign(Positive) { v.push_back(0); };
 	BigInt(long n);
 	BigInt(const BigInt & bi);
 
 	BigInt add (const BigInt & bi2);
 	BigInt multiply (const BigInt & bi2);
 	BigInt subtract (const BigInt & bi2)const ;
+	void set_digit(int pos, int value);
 	friend BigInt subtract (const BigInt & bi1, const BigInt & bi2) ;
 	void print() const ;
 	// unsafe - will not handle overflow

@@ -71,6 +71,7 @@ BigInt::BigInt(long n)
 		// 	<< ", digit: " << digit
 		// 	<< endl;
 	} while (carry > 0);
+	if (n < 0) { sign = Negative; } else { sign = Positive; }
 }
 
 // warning - use when base is small like 100 and you
@@ -238,7 +239,7 @@ BigInt BigInt::multiply (const BigInt & bi2) {
 
 void print_digits_with_padding(const vector<int> & v, std::ostream & os) {
 
-	for (int i = v.size()-2; (v.size()-2) >=0 && i>= 0; --i) {
+	for (int i = (long) v.size()-2; ((long)v.size()-2) >=0 && i>= 0; --i) {
 		// pad the remaining with required 
 		// amount of 0s
 		if (v[i] == 0) {
@@ -300,6 +301,8 @@ void print_digits_with_padding(const vector<int> & v, std::ostream & os) {
 std::ostream & operator << (std::ostream &os, BigInt const & bi)
 {
 	if (bi.v.size() == 0) {
+		os << 0;
+	} else if (bi.v.size() == 1 && bi.v[0] == 0) {
 		os << 0;
 	} else {
 		// if (bi.v[bi.v.size() == 0]) {
@@ -423,6 +426,9 @@ BigInt BigInt::actual_subtract(const BigInt & bi2) const
 	// we handle this case - for protection 
 	// 
 	if (bi1 == bi2) {
+		cout << "EXIT " << fn_name
+			<< " case bi1:" << bi1
+			<< " == bi2: " << bi2 << endl;
 		return res;
 	}
 	cout	<< " bi1: "; bi1.print(); cout << endl;
@@ -443,20 +449,24 @@ BigInt BigInt::actual_subtract(const BigInt & bi2) const
 		if (bi1.v[i] < bi2.v[i]) {
 			cout << " Doing a borrow bi1.v[" << i+1 << "] was "
 				<< bi1.v[i+1]
-				<< " v[" << i << "] was " << v[i];
+				<< " v[" << i << "] was " << v[i] << endl;
 
 			bi1.v[i+1] -= 1;
-			bi1.v[i] *= base;
-			cout <<   " after borrow bi1.v[" << i+1 << "] is "
+			bi1.v[i] += base;
+			cout << "   After borrow bi1.v[" << i+1 << "] is  "
 				<< bi1.v[i+1]
-				<< " v[" << i << "]  is " << v[i];
+				<< " v[" << i << "]  is " << v[i] << endl;
 		}
-		res.v.push_back( bi1.v[i] - bi2.v[i]);
+		int digit_difference  =  ( bi1.v[i] - bi2.v[i]);
+		cout << "digit_difference: " << digit_difference << endl;
+		res.set_digit(i, digit_difference);
+		// res.v.push_back(digit_difference);
 	}
 	int bi1_sz = bi1.size();
-	for (int i = bi2_sz; i < bi1.size(); ++i) {
+	for (int i = bi2_sz; i < bi1_sz; ++i) {
 		res.v.push_back(bi1.v[i]);
 	}
+	cout << "EXIT " << fn_name << " res: " << res << endl;
 	return res;
 }
 
@@ -469,6 +479,7 @@ BigInt subtract (const BigInt & bi1, const BigInt & bi2)
 		<< " bi1: " << bi1
 		<< " bi2: " << bi2 << endl;
 
+
 	BigInt res;
 	if (bi1 < bi2) {
 		cout << " case bi1 < bi2" << endl;
@@ -479,8 +490,10 @@ BigInt subtract (const BigInt & bi1, const BigInt & bi2)
 		// res is 0
 	} else {
 		cout << " case bi1 > bi2" << endl;
-		res = bi1.actual_subtract(bi1);
+		res = bi1.actual_subtract(bi2);
 	}
+	
+
 	cout << "EXIT " << fn_name << " returning : " << res;
 	return res;
 }
@@ -492,9 +505,8 @@ BigInt subtract (const BigInt & bi1, const BigInt & bi2)
 // 	}
 // }
 
-BigInt::BigInt(const BigInt & bi): v(bi.v)
-{
-}
+BigInt::BigInt(const BigInt & bi): v(bi.v), sign(bi.sign)
+{ }
 
 bool numeric_magnitude (const BigInt & bi1, const BigInt & bi2)
 {
@@ -542,4 +554,29 @@ bool numeric_magnitude (const BigInt & bi1, const BigInt & bi2)
 		return false;
 	}
 
+}
+
+void BigInt::set_digit(int pos, int value)
+{
+	std::string fn_name = __PRETTY_FUNCTION__;
+	cout << "ENTER " << fn_name << " pos : " << pos
+		<< ", value: " << value
+		<< ", v.size(): " << v.size()
+		<< ", v.size()-1: " << ((int)v.size() - 1)
+		<< endl ;
+	if (pos <= (int)v.size()-1 ) {
+		cout << "INFO " << fn_name << " - 1" << endl;
+		v[pos] = value;
+	} else {
+		for (int i = (int)v.size()-1; i <= pos - ((int) v.size()-1);
+				++i) {
+			cout << "INFO " << fn_name << "i: " << i << endl;
+			v.push_back(0);
+		}
+		v[pos] = value;
+		cout << "INFO " << fn_name << " - 2" << endl;
+	}
+	cout << "INFO " << fn_name <<" v: " << endl;
+	::print(v);
+	cout << "EXIT " << fn_name << " " << endl;
 }

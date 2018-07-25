@@ -465,14 +465,54 @@ void test_subtract(const BigInt & bi1, const BigInt & bi2)
 		<< " bi1 : " << bi1
 		<< " , bi2: " << bi2
 		<< endl;
+	BigInt res1 = subtract(bi1, bi2);
 	cout << "bi1: " << bi1 << "bi2: "
 		<< bi2 << " (bi1 - bi2): "
-		<< subtract(bi1, bi2)
+		<< res1
 		<< endl;
+	cout << "res1 (bi1 - bi2):  ";
+	res1.print();
+
+
+	BigInt res2 = subtract(bi2, bi1);
 	cout << "bi1: " << bi1 << "bi2: "
 		<< bi2 << " (bi2 - bi1): "
-		<< subtract(bi2, bi1)
+		<< res2
 		<< endl;
+	cout << "res2 (bi2 - bi1):  ";
+	res2.print();
+	long l1 = bi1.to_long();
+	long l2 = bi2.to_long();
+	cout << "expected: " << "l1: " << l1 << " - l2: " << l2
+		<< " = (l1 - l2): " << (l1 - l2)
+		<< ", actual: " << res1 << endl;
+	cout << "expected: " << "l2: " << l2 << " - l1: " << l1
+		<< " = (l2 - l1): " << (l2 - l1)
+		<< ", actual: " << res2 << endl;
+	std::stringstream act1;
+	act1 << res1;
+	std::stringstream act2;
+	act2 << res2;
+	std::stringstream exp1;
+	exp1 << (l1-l2);
+	std::stringstream exp2;
+	exp2 << (l2-l1);
+
+	if (act1.str() == exp1.str()) {
+		cout << "operator - subtract PASSED" << endl;
+	} else {
+		cout << "operator - subtract FAILED" 
+			<< act1.str() << " vs " << exp1.str()
+			<< endl;
+	}
+	if (act2.str() == exp2.str()) {
+		cout << "operator - subtract PASSED" << endl;
+	} else {
+		cout << "operator - subtract FAILED"
+			<< act1.str() << " vs " << exp1.str()
+			<< endl;
+	}
+
 }
 
 void test_subtract()
@@ -540,6 +580,10 @@ void test_subtract()
 	}
 	{
 		BigInt bi1(987), bi2(76);
+		test_subtract(bi1, bi2);
+	}
+	{
+		BigInt bi1(976), bi2(87);
 		test_subtract(bi1, bi2);
 	}
 
