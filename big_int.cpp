@@ -580,3 +580,68 @@ void BigInt::set_digit(int pos, int value)
 	::print(v);
 	cout << "EXIT " << fn_name << " " << endl;
 }
+
+BigInt highest_product_close_to_number(const BigInt & dividend,
+		const BigInt & divisor)
+{
+	std::string fn_name = __PRETTY_FUNCTION__;
+	cout << "ENTER " << fn_name
+		<< "  dividend: " << dividend 
+		<< ", divisor: " << divisor
+		<< endl;
+	int highest_digit_dividend = dividend.size();
+	int highest_digit_divisor = divisor.size();
+
+	int shift = highest_digit_dividend - highest_digit_divisor;
+	if (shift < 0) {
+		return BigInt(0);
+	}
+	BigInt divisor_temp = divisor;
+	BigInt left_shift = power(BigInt(BigInt::base), shift);
+	cout << "INFO  left_shift: " << left_shift;
+	//BigInt divisor2(divisor);
+	divisor_temp = divisor_temp.multiply(left_shift);
+	cout << "INFO highest_product_close_to_number returning dividend_temp: " 
+		<< divisor_temp << endl;
+	return divisor_temp;
+
+}
+
+BigInt power(const BigInt & bi, long n)
+{
+	if (n == 1) {
+		return bi;
+	} else {
+		BigInt res = power(bi, n/2);
+		BigInt res2 = res.multiply(res);
+		if (n % 2 == 0) {
+			return res2;
+		} else {
+			return res2.multiply(bi);
+		}
+	}
+}
+
+std::pair<BigInt, BigInt> divide(const BigInt & dividend,
+			const BigInt & divisor)
+{
+	std::string fn = __PRETTY_FUNCTION__;
+	cout << "ENTER " << fn << ", dividend: " << dividend
+		<< ", divisor: " << divisor << endl;
+
+	BigInt remainder;
+	BigInt quotient(dividend);
+	int counter = 1;
+	do {
+		remainder = highest_product_close_to_number(dividend,
+				divisor);
+		quotient = remainder;
+		// Im pretty sure we're gonna have infinite loops
+		// for now - just 1 round and we
+		++ counter;
+		if (counter > 1) {
+			break;
+		}
+	} while (!(remainder < dividend));
+	return std::pair<BigInt, BigInt>(quotient, remainder);
+}

@@ -744,9 +744,20 @@ void test_oper_less() {
 	}
 }
 
+void test_divide()
+{
+	BigInt dividend(1977), divisor(37);
+	std::pair<BigInt, BigInt> res = divide(dividend, divisor);
+	cout
+		<< "quotient: " << res.first << endl
+		<< "remainder: " << res.second
+		<< endl;
+}
+
 
 // #ifdef ENABLE_MAIN
-int BigInt::base = 1000000;
+// int BigInt::base = 1000000;
+int BigInt::base = 10;
 int main()
 {
 	BigInt b1(1413121110987654321);
@@ -800,6 +811,9 @@ int main()
 #if TEST_SUBTRACT
 	test_subtract();
 #endif /* TEST_SUBTRACT */
+#if TEST_DIVIDE
+	test_divide();
+#endif /* TEST_DIVIDE */
 	// map<BigInt, BigInt > m_big_int;
 	// BigInt b31(1001), b41(200321);
 	// m_big_int[b31] = b31;

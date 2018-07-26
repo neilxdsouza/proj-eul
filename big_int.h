@@ -10,13 +10,15 @@
 #include <vector>
 #include <ostream>
 
+
+
 struct BigInt {
 	static int base;
 	std::vector<int> v;
 	enum Sign { Negative, Positive};
 	Sign sign;
 	int size() const;
-	void set_size(int n) { v.resize(n); 
+	void set_size(int n) { v.resize(n, 0);
 		for (int i = 0; i < v.size(); ++i) {
 			v[i] = 0;
 		}
@@ -42,6 +44,12 @@ struct BigInt {
 	void set_sign(Sign s);
 
 	BigInt actual_subtract(const BigInt & bi2) const;
+
+	friend std::pair<BigInt, BigInt> divide(const BigInt & dividend,
+			const BigInt & divisor);
+	friend BigInt highest_product_close_to_number(BigInt & n, BigInt p);
+	friend BigInt power(const BigInt & bi, long power);
+	friend BigInt power(long n);
 
 };
 
